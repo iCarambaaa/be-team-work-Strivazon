@@ -36,4 +36,23 @@ productsRouter.get("/:id", async(req, res, next) => {
 })
 
 
+// POST product
+
+productsRouter.post("/", async(req, res, next) => {
+    try {
+        const products = await readProducts()
+
+        const newProduct = {...req.body, id: uniqid(), createdAt: new Date()}
+
+        products.push(newProduct)
+
+        await writeProducts(products)
+      
+        res.status(201).send(newProduct.id)
+
+    } catch (error) {
+        next(error)
+    }
+})
+
 export default productsRouter
