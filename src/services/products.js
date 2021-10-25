@@ -9,7 +9,7 @@ import {
   readReviews,
 } from "../lib/fs-tools.js";
 //import reviewsRouter from "./reviews.js";
-import { productValidationMiddlewares } from "../lib/validations.js";
+import { productValidationMiddlewares } from "../lib/validation.js";
 import { validationResult } from "express-validator";
 
 const productsRouter = express.Router();

@@ -3,7 +3,7 @@ import uniqid from "uniqid";
 import createError from "http-errors"
 import {readReviews, writeReviews} from "../lib/fs-tools.js"
 import productsRouter from "./products.js";
-import { reviewsValidationMiddlewares } from "../lib/validations.js";
+import { reviewsValidationMiddlewares } from "../lib/validation.js";
 import { validationResult } from "express-validator"
 
 
