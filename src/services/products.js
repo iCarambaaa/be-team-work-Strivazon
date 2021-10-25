@@ -55,4 +55,26 @@ productsRouter.post("/", async(req, res, next) => {
     }
 })
 
+// DELETE 
+
+productsRouter.delete("/:id", async(req, res, next) => {
+
+ try {
+        const products = await readProducts()
+
+        const remainingProducts = products.filter(product => product.id !== req.params.id)
+
+        writeProducts(remainingProducts)
+
+        res.status(200).send(`product with id ${req.params.id} deleted successfully`)
+
+    } catch (error) {
+        next(error)
+    }
+
+})
+
+//PUT
+
+
 export default productsRouter
