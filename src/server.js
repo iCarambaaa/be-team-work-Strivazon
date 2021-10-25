@@ -1,12 +1,8 @@
 import express from 'express';
 import listEndpoints from "express-list-endpoints";
 import productsRouter from "./services/products.js";
-<<<<<<< Updated upstream
-import reviewsRouter from "./services/posts/index.js";
-import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
-=======
 import reviewsRouter from "./services/reviews.js";
->>>>>>> Stashed changes
+import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
 import cors from "cors";
 
 const server = express();
@@ -17,14 +13,9 @@ server.use(express.json())
 
 // ************************ ENDPOINTS **********************
 server.use("/products", productsRouter)
-<<<<<<< Updated upstream
 server.use("/reviews", reviewsRouter)
-=======
- server.use("/reviews", reviewsRouter)
->>>>>>> Stashed changes
 
 // *********************** ERROR MIDDLEWARES ***************************
-
 
 server.use(badRequestHandler)
 server.use(unauthorizedHandler)

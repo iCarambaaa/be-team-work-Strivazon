@@ -2,19 +2,14 @@ import express from "express";
 import uniqid from "uniqid";
 import createError from "http-errors"
 import {readReviews, writeReviews} from "../lib/fs-tools.js"
-<<<<<<< Updated upstream
 import productsRouter from "./products.js";
-=======
->>>>>>> Stashed changes
+import { reviewsValidationMiddlewares } from "../lib/validations.js";
+import { validationResult } from "express-validator"
 
 
 const reviewsRouter = express.Router()
 
-<<<<<<< Updated upstream
 // GET all reviews
-=======
-// GET all products
->>>>>>> Stashed changes
 reviewsRouter.get("/", async(req, res, next) => {
         try {
             const reviews = await readReviews()
@@ -24,11 +19,7 @@ reviewsRouter.get("/", async(req, res, next) => {
         }
 })
 
-<<<<<<< Updated upstream
 // GET individual review
-=======
-// GET individual product
->>>>>>> Stashed changes
 reviewsRouter.get("/:id", async(req, res, next) => {
     try {
         const reviews = await readReviews()
@@ -38,11 +29,7 @@ reviewsRouter.get("/:id", async(req, res, next) => {
         if (singlereview) {
             res.status(200).send(singlereview)
         } else {
-<<<<<<< Updated upstream
             next(createError(404, `review with id ${req.params.id} not found`))
-=======
-            next(createError(404, `product with id ${req.params.id} not found`))
->>>>>>> Stashed changes
         }
 
     } catch (error) {
@@ -51,28 +38,27 @@ reviewsRouter.get("/:id", async(req, res, next) => {
 })
 
 
-<<<<<<< Updated upstream
 // POST review
-=======
-// POST product
->>>>>>> Stashed changes
 
-reviewsRouter.post("/", async(req, res, next) => {
+reviewsRouter.post("/", reviewsValidationMiddlewares, async(req, res, next) => {
     try {
-        const reviews = await readReviews()
+        const errors = validationResult(req)
 
-<<<<<<< Updated upstream
-        const newReview = {...req.body, 
-            id: uniqid(), createdAt: new Date()}
-=======
-        const newReview = {...req.body, id: uniqid(), createdAt: new Date()}
->>>>>>> Stashed changes
+        if(errors.isEmpty()){
+            const reviews = await readReviews()
 
-        reviews.push(newReview)
-
-        await writeReviews(reviews)
-      
-        res.status(201).send(newReview.id)
+            const newReview = {...req.body, 
+                id: uniqid(), createdAt: new Date()}
+    
+            reviews.push(newReview)
+    
+            await writeReviews(reviews)
+          
+            res.status(201).send(newReview.id)
+        }else{
+            next(createError(400, {errors}))
+        }
+       
 
     } catch (error) {
         next(error)
@@ -81,11 +67,7 @@ reviewsRouter.post("/", async(req, res, next) => {
 
 // DELETE 
 
-<<<<<<< Updated upstream
-previewsRouter.delete("/:id", async(req, res, next) => {
-=======
 reviewsRouter.delete("/:id", async(req, res, next) => {
->>>>>>> Stashed changes
 
  try {
         const reviews = await readReviews()
@@ -94,11 +76,7 @@ reviewsRouter.delete("/:id", async(req, res, next) => {
 
         writeReviews(remainingReviews)
 
-<<<<<<< Updated upstream
         res.status(200).send(`review with id ${req.params.id} deleted successfully`)
-=======
-        res.status(200).send(`product with id ${req.params.id} deleted successfully`)
->>>>>>> Stashed changes
 
     } catch (error) {
         next(error)
@@ -108,7 +86,7 @@ reviewsRouter.delete("/:id", async(req, res, next) => {
 
 //PUT
 
-reviewsRouter.put("/:id", async(req, res, next)=> {
+reviewsRouter.put("/:id", reviewsValidationMiddlewares, async(req, res, next)=> {
     try {
         const reviews = await readReviews()
 
