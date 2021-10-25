@@ -2,10 +2,37 @@ import express from "express";
 import uniqid from "uniqid";
 import createError from "http-errors"
 import multer from "multer";
-import {readProducts, writeProducts, saveProductPicture} from "../lib/fs-tools.js"
+import {readProducts, writeProducts, saveProductPicture,readReviews} from "../lib/fs-tools.js"
 
 
 const productsRouter = express.Router()
+
+// Get all reviews of specific product
+productsRouter.get("/:id/reviews", async(req, res, next)=>{
+    try {
+        const products = await readProducts()
+        const singleProduct = products.find(product => product.id === req.params.id)
+
+        if(singleProduct){
+            
+            const reviews = await readReviews()
+            const specificRevies = reviews.filter(r => r.productId === req.params.id)
+            
+            if (reviews) {
+                res.send(specificRevies)
+
+            } else {
+                res.send("nada")
+            }
+             
+        }else{
+            next(createError(404, `This product id: ${req.params.id} was not find`))
+        }
+
+    } catch (error) {
+        next(error)
+    }
+})
 
 // GET all products
 productsRouter.get("/", async(req, res, next) => {
@@ -114,6 +141,22 @@ productsRouter.post("/:id/uploadSingle", multer().single("productPicture") , asy
     } catch (error) {
         next(error)
     }
+})
+
+//get category
+productsRouter.get("/?category", async(req, res, next) => { 
+    try {
+        
+        const content = await readProducts()
+        const category = req.query
+        console.log(category)
+            const filteredproduct = content.filter(element => element.category === req.query)
+            res.send(filteredproduct)
+
+    } catch (error) {    
+        next(error)    
+    }
+
 })
 
 
