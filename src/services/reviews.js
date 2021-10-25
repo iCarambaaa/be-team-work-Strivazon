@@ -3,6 +3,8 @@ import uniqid from "uniqid";
 import createError from "http-errors"
 import {readReviews, writeReviews} from "../lib/fs-tools.js"
 import productsRouter from "./products.js";
+import { reviewsValidationMiddlewares } from "../lib/validations.js";
+import { validationResult } from "express-validator"
 
 
 const reviewsRouter = express.Router()
@@ -38,18 +40,25 @@ reviewsRouter.get("/:id", async(req, res, next) => {
 
 // POST review
 
-reviewsRouter.post("/", async(req, res, next) => {
+reviewsRouter.post("/", reviewsValidationMiddlewares, async(req, res, next) => {
     try {
-        const reviews = await readReviews()
+        const errors = validationResult(req)
 
-        const newReview = {...req.body, 
-            id: uniqid(), createdAt: new Date()}
+        if(errors.isEmpty()){
+            const reviews = await readReviews()
 
-        reviews.push(newReview)
-
-        await writeReviews(reviews)
-      
-        res.status(201).send(newReview.id)
+            const newReview = {...req.body, 
+                id: uniqid(), createdAt: new Date()}
+    
+            reviews.push(newReview)
+    
+            await writeReviews(reviews)
+          
+            res.status(201).send(newReview.id)
+        }else{
+            next(createError(400, {errors}))
+        }
+       
 
     } catch (error) {
         next(error)
@@ -58,7 +67,7 @@ reviewsRouter.post("/", async(req, res, next) => {
 
 // DELETE 
 
-previewsRouter.delete("/:id", async(req, res, next) => {
+reviewsRouter.delete("/:id", async(req, res, next) => {
 
  try {
         const reviews = await readReviews()
@@ -77,7 +86,7 @@ previewsRouter.delete("/:id", async(req, res, next) => {
 
 //PUT
 
-reviewsRouter.put("/:id", async(req, res, next)=> {
+reviewsRouter.put("/:id", reviewsValidationMiddlewares, async(req, res, next)=> {
     try {
         const reviews = await readReviews()
 
