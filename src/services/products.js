@@ -76,5 +76,27 @@ productsRouter.delete("/:id", async(req, res, next) => {
 
 //PUT
 
+productsRouter.put("/:id", async(req, res, next)=> {
+    try {
+        const products = await readProducts()
+
+        const singleProductIndex = products.findIndex(index => index.id === req.params.id)
+
+        const singleProduct = products.singleProductIndex 
+
+        const updatedProduct = {...singleProduct, ...req.body, updatedAt: new Date()} 
+
+        products[singleProductIndex] = updatedProduct
+
+        writeProducts(products)
+
+        res.status(200).send(`product with id ${req.params.id} updated successfully`)
+
+    } catch (error) {
+        next(error)
+    }
+
+})
+
 
 export default productsRouter
