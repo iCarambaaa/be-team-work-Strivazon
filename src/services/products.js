@@ -17,8 +17,23 @@ productsRouter.get("/", async(req, res, next) => {
         }
 })
 
+// GET individual product
+productsRouter.get("/:id", async(req, res, next) => {
+    try {
+        const products = await readProducts()
 
+        const singleProduct = products.find(product => product.id === req.params.id)
 
+        if (singleProduct) {
+            res.status(200).send(singleProduct)
+        } else {
+            next(createError(404, `product with id ${req.params.id} not found`))
+        }
+
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 export default productsRouter
