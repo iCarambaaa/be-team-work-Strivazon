@@ -2,7 +2,7 @@ import express from "express";
 import uniqid from "uniqid";
 import createError from "http-errors"
 import multer from "multer";
-import {readProducts, writeProducts} from "../lib/fs-tools.js"
+import {readProducts, writeProducts, saveProductPicture} from "../lib/fs-tools.js"
 
 
 const productsRouter = express.Router()
@@ -82,7 +82,7 @@ productsRouter.put("/:id", async(req, res, next)=> {
 
         const singleProductIndex = products.findIndex(index => index.id === req.params.id)
 
-        const singleProduct = products.singleProductIndex 
+        const singleProduct = products[singleProductIndex] 
 
         const updatedProduct = {...singleProduct, ...req.body, updatedAt: new Date()} 
 
@@ -97,6 +97,25 @@ productsRouter.put("/:id", async(req, res, next)=> {
     }
 
 })
+
+
+// POST Picture
+
+productsRouter.post("/:id/uploadSingle", multer().single("productPicture") , async(req, res, next)=> {
+
+    try {
+
+        const fileName = req.file.originalname 
+        console.log(fileName)
+        await saveProductPicture(fileName, req.file.buffer)
+
+        res.send("ok")
+
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 
 export default productsRouter
