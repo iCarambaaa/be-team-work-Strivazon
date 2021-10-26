@@ -1,9 +1,8 @@
 import express from 'express';
 import listEndpoints from "express-list-endpoints";
 import productsRouter from "./services/products.js";
-
-import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
 import reviewsRouter from "./services/reviews.js";
+import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
 import cors from "cors";
 
 const server = express();
@@ -17,7 +16,6 @@ server.use("/products", productsRouter)
 server.use("/reviews", reviewsRouter)
 
 // *********************** ERROR MIDDLEWARES ***************************
-
 
 server.use(badRequestHandler)
 server.use(unauthorizedHandler)
