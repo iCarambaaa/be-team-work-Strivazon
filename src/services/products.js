@@ -9,10 +9,8 @@ import {
   readReviews,
 } from "../lib/fs-tools.js";
 //import reviewsRouter from "./reviews.js";
-import {
-    productValidationMiddlewares
-} from "../lib/validations.js";
-import { validationResult} from "express-validator";
+import { productValidationMiddlewares } from "../lib/validation.js";
+import { validationResult } from "express-validator";
 
 const productsRouter = express.Router();
 
@@ -57,55 +55,30 @@ productsRouter.get("/:id/reviews", async (req, res, next) => {
 
 // POST product
 
-// 1.
-// studentsRouter.post("/", studentValidationMiddlewares, (req, res, next) => {
-//     const errorsList = validationResult(req)
+productsRouter.post(
+  "/",
+  productValidationMiddlewares,
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (errors.isEmpty()) {
+        const products = await readProducts();
 
-//     if (!errorsList.isEmpty()) {
-//       // If we had validation errors --> we need to trigger Bad Request Error Handler
-//       next(createHttpError(400, { errorsList }))
-//     } else {
-//       // First parameter is relative URL, second parameter is the REQUEST HANDLER
+        const newProduct = { ...req.body, id: uniqid(), createdAt: new Date() };
 
-//       // 1. Read the request body obtaining the new student's data
+        products.push(newProduct);
 
-//       const newStudent = { ...req.body, createdAt: new Date(), id: uniqid() }
+        await writeProducts(products);
 
-//       // 2. Read the file content obtaining the students array
-//       const students = JSON.parse(fs.readFileSync(studentsJSONPath))
-
-//       // 3. Add new student to the array
-//       students.push(newStudent)
-
-//       // 4. Write the array back to the file
-//       fs.writeFileSync(studentsJSONPath, JSON.stringify(students))
-
-//       // 5. Send back a proper response
-
-//       res.status(201).send({ id: newStudent.id })
-//     }
-//   })
-
-productsRouter.post("/", productValidationMiddlewares, async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (errors.isEmpty()) {
-      const products = await readProducts();
-
-      const newProduct = { ...req.body, id: uniqid(), createdAt: new Date() };
-
-      products.push(newProduct);
-
-      await writeProducts(products);
-
-      res.status(201).send(newProduct.id);
-    }else{
-        next(createError(400, {errors: errors}))
+        res.status(201).send(newProduct.id);
+      } else {
+        next(createError(400, { errors }));
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 // DELETE
 
@@ -120,44 +93,55 @@ productsRouter.delete("/:id", async (req, res, next) => {
     writeProducts(remainingProducts);
 
     res
-      .status(200)
-      .send(`product with id ${req.params.id} deleted successfully`);
+      .status(204)
+      .send(`Author with id ${req.params.id} deleted successfully`);
   } catch (error) {
     next(error);
   }
 });
 
-//PUT
+      res.status(201).send(newProduct.id);
+    }else{
+        next(createError(400, {errors: errors}))
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
-productsRouter.put("/:id", productValidationMiddlewares, async (req, res, next) => {
-  try {
-    const products = await readProducts();
+productsRouter.put(
+  "/:id",
+  productValidationMiddlewares,
+  async (req, res, next) => {
+    try {
+      const products = await readProducts();
 
-    const singleProductIndex = products.findIndex(
-      (index) => index.id === req.params.id
-    );
+      const singleProductIndex = products.findIndex(
+        (index) => index.id === req.params.id
+      );
 
-    const singleProduct = products[singleProductIndex];
+      const singleProduct = products[singleProductIndex];
 
-    const updatedProduct = {
-      ...singleProduct,
-      ...req.body,
-      updatedAt: new Date(),
-    };
+      const updatedProduct = {
+        ...singleProduct,
+        ...req.body,
+        updatedAt: new Date(),
+      };
+
+      products[singleProductIndex] = updatedProduct;
+
+      writeProducts(products);
+
+      res
+        .status(200)
+        .send(`product with id ${req.params.id} updated successfully`);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
     products[singleProductIndex] = updatedProduct;
-
-    writeProducts(products);
-
-    res
-      .status(200)
-      .send(`product with id ${req.params.id} updated successfully`);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// POST Picture
 
 productsRouter.post(
   "/:id/uploadSingle",
@@ -179,7 +163,7 @@ productsRouter.post(
 productsRouter.get("/search", async (req, res, next) => {
   try {
     const { category } = req.query;
-    console.log("Category var",{ category });
+    console.log("Category var", { category });
     const content = await readProducts();
 
     const filteredproduct = content.filter(
