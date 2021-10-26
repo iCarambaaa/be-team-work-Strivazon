@@ -9,7 +9,7 @@ import {
   readReviews,
 } from "../lib/fs-tools.js";
 //import reviewsRouter from "./reviews.js";
-import { productValidationMiddlewares } from "../lib/validations.js";
+import { productValidationMiddlewares } from "../lib/validation.js";
 import { validationResult } from "express-validator";
 
 const productsRouter = express.Router();
@@ -51,38 +51,8 @@ productsRouter.get("/:id/reviews", async (req, res, next) => {
   }
 });
 
-// Get single review
 
 // POST product
-
-// 1.
-// studentsRouter.post("/", studentValidationMiddlewares, (req, res, next) => {
-//     const errorsList = validationResult(req)
-
-//     if (!errorsList.isEmpty()) {
-//       // If we had validation errors --> we need to trigger Bad Request Error Handler
-//       next(createHttpError(400, { errorsList }))
-//     } else {
-//       // First parameter is relative URL, second parameter is the REQUEST HANDLER
-
-//       // 1. Read the request body obtaining the new student's data
-
-//       const newStudent = { ...req.body, createdAt: new Date(), id: uniqid() }
-
-//       // 2. Read the file content obtaining the students array
-//       const students = JSON.parse(fs.readFileSync(studentsJSONPath))
-
-//       // 3. Add new student to the array
-//       students.push(newStudent)
-
-//       // 4. Write the array back to the file
-//       fs.writeFileSync(studentsJSONPath, JSON.stringify(students))
-
-//       // 5. Send back a proper response
-
-//       res.status(201).send({ id: newStudent.id })
-//     }
-//   })
 
 productsRouter.post(
   "/",
@@ -122,8 +92,8 @@ productsRouter.delete("/:id", async (req, res, next) => {
     writeProducts(remainingProducts);
 
     res
-      .status(200)
-      .send(`product with id ${req.params.id} deleted successfully`);
+      .status(204)
+      .send(`Author with id ${req.params.id} deleted successfully`);
   } catch (error) {
     next(error);
   }
